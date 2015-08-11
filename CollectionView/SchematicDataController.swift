@@ -4,11 +4,13 @@ class SchematicDataController : NSObject {
     var tree: Node? {
         didSet {
             var nodes = [[Node]]()
-            Node.walk(tree!) { (node, level) -> () in
-                if nodes.count > level {
-                    nodes[level] = nodes[level]+[node]
-                } else {
-                    nodes.append([node])
+            if let tree = tree {
+                Node.walk(tree) { (node, level) -> () in
+                    if nodes.count > level {
+                        nodes[level] = nodes[level]+[node]
+                    } else {
+                        nodes.append([node])
+                    }
                 }
             }
             sections = nodes
