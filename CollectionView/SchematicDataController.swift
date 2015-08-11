@@ -5,13 +5,13 @@ class SchematicDataController : NSObject {
         didSet {
             var nodes = [[Node]]()
             if let tree = tree {
-                Node.walk(tree) { (node, level) -> () in
+                tree.walk({ (node, level) -> () in
                     if nodes.count > level {
                         nodes[level] = nodes[level]+[node]
                     } else {
                         nodes.append([node])
                     }
-                }
+                })
             }
             sections = nodes
         }
