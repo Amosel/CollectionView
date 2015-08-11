@@ -26,6 +26,17 @@ class Node : Hashable, Equatable {
 			return (self.name.hashValue << 16) + (self.children.reduce(Int()) { return $0 + $1.hashValue} << 8)
 		}
 	}
+    
+    func walk(level:Int, @noescape visit:(node:Node,level:Int)->()) {
+        visit(node: self,level: level)
+        let nextLevel = level+1
+        for each in self.children {
+            each.walk(nextLevel, visit: visit)
+        }
+    }
+    func walk(@noescape visit:(node:Node, level:Int) -> ()) {
+        walk(0, visit: visit)
+    }
 }
 
 func ==(lhs:Node, rhs:Node) -> Bool {
