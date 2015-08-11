@@ -61,6 +61,16 @@ class CollectionViewLayout : UICollectionViewLayout {
 						if rect.contains(section.frameForItemAtIndex(itemIndex)) {
 							let indexPath = NSIndexPath(forItem: itemIndex, inSection: sectionIndex)
 							itemAttributes.append(self.layoutAttributesForItemAtIndexPath(indexPath)!)
+                            // add the connector view:
+                            let nextSectionIndex = sectionIndex + 1
+                            if let nextSection = sectionDescriptions.optionalElementAtIndex(nextSectionIndex) {
+                                let children = nextSection.items.enumerate().filter() { childIndex, child in child.parents.containsIndex(itemIndex) }
+                                for (childIndex, _) in children {
+                                    let indexPath = NSIndexPath(forItem: childIndex, inSection: nextSectionIndex)
+                                    let t = self.layoutAttributesForSupplementaryViewOfKind(SchematicLayout.connectorViewKind, atIndexPath:indexPath)
+                                    itemAttributes.append(t!)
+                                }
+                            }
 						}
 						return itemAttributes
 					}
@@ -78,6 +88,25 @@ class CollectionViewLayout : UICollectionViewLayout {
 		}
 		return attributes
 	}
+    
+    override func layoutAttributesForSupplementaryViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+            let attributes = SchematicLayoutAttributes(forSupplementaryViewOfKind: elementKind, withIndexPath: indexPath)
+            if let sectionDescriptions = self.sectionDescriptions, dataController = self.dataController
+            {
+                let node = dataController.nodeAtIndexPath(indexPath)
+                let childSectionDescription = sectionDescriptions[indexPath.section]
+                let childFrame = childSectionDescription.frameForItemAtIndex(indexPath.item)
+                for parentIndex in childSectionDescription.items[indexPath.item].parents
+                {
+                    let parentIndexPath = NSIndexPath(forItem: parentIndex, inSection: indexPath.section - 1)
+                    let parentFrame = sectionDescriptions[parentIndexPath.section].frameForItemAtIndex(parentIndexPath.item)
+                    let y = min(parentFrame.midY, childFrame.midY)
+                    attributes.frame = CGRect(x: parentFrame.maxX, y: y, width: abs(childFrame.minX - parentFrame.maxX), height: abs(childFrame.midY - parentFrame.midY))
+                    attributes.connectorLineStartTop = parentFrame.midY > childFrame.midY
+                }
+            }
+            return attributes
+    }
 }
 
 
