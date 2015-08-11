@@ -18,7 +18,7 @@
 		6C50B7381B79259B00E6899C /* SchematicNodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50B7371B79259B00E6899C /* SchematicNodeCell.swift */; };
 		6C50B73A1B7925BE00E6899C /* SchematicLayoutAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50B7391B7925BE00E6899C /* SchematicLayoutAttributes.swift */; };
 		6C50B73D1B7925E700E6899C /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50B73C1B7925E700E6899C /* Node.swift */; };
-		6C50B73F1B79261000E6899C /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50B73E1B79261000E6899C /* ArrayExtension.swift */; };
+		6C50B73F1B79261000E6899C /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50B73E1B79261000E6899C /* Extension.swift */; };
 		E6384CF01B794DC40001A395 /* SchematicConnetorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6384CEF1B794DC40001A395 /* SchematicConnetorView.swift */; };
 /* End PBXBuildFile section */
 
@@ -37,7 +37,7 @@
 		6C50B7371B79259B00E6899C /* SchematicNodeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchematicNodeCell.swift; sourceTree = "<group>"; };
 		6C50B7391B7925BE00E6899C /* SchematicLayoutAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchematicLayoutAttributes.swift; sourceTree = "<group>"; };
 		6C50B73C1B7925E700E6899C /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
-		6C50B73E1B79261000E6899C /* ArrayExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
+		6C50B73E1B79261000E6899C /* Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		E6384CEF1B794DC40001A395 /* SchematicConnetorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchematicConnetorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -81,7 +81,7 @@
 				E6384CEF1B794DC40001A395 /* SchematicConnetorView.swift */,
 				6C50B71E1B78D1CE00E6899C /* CollectionViewController.swift */,
 				6C50B7371B79259B00E6899C /* SchematicNodeCell.swift */,
-				6C50B73E1B79261000E6899C /* ArrayExtension.swift */,
+				6C50B73E1B79261000E6899C /* Extension.swift */,
 				6C50B7221B78D1CE00E6899C /* Main.storyboard */,
 				6C50B7251B78D1CE00E6899C /* Assets.xcassets */,
 				6C50B7271B78D1CE00E6899C /* LaunchScreen.storyboard */,
@@ -163,7 +163,7 @@
 				6C50B73A1B7925BE00E6899C /* SchematicLayoutAttributes.swift in Sources */,
 				6C50B7311B78D26F00E6899C /* SchematicDataController.swift in Sources */,
 				6C50B71F1B78D1CE00E6899C /* CollectionViewController.swift in Sources */,
-				6C50B73F1B79261000E6899C /* ArrayExtension.swift in Sources */,
+				6C50B73F1B79261000E6899C /* Extension.swift in Sources */,
 				6C50B73D1B7925E700E6899C /* Node.swift in Sources */,
 				6C50B71D1B78D1CE00E6899C /* AppDelegate.swift in Sources */,
 				E6384CF01B794DC40001A395 /* SchematicConnetorView.swift in Sources */,
