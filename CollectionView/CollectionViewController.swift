@@ -4,6 +4,7 @@ class CollectionViewController: UICollectionViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+        collectionView?.registerClass(SchematicConnectorView.self, forSupplementaryViewOfKind: SchematicLayout.connectorViewKind, withReuseIdentifier: SchematicConnectorView.viewReuseIdentifier)
         let dataController = SchematicDataController()
 		dataController.performFetch()
         self.dataController = dataController
@@ -42,5 +43,10 @@ class CollectionViewController: UICollectionViewController {
 		cell.node = self.dataController?.nodeAtIndexPath(indexPath)
 		return cell
 	}
+    override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) ->
+        UICollectionReusableView
+    {
+        return self.collectionView!.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: SchematicLayout.connectorViewKind, forIndexPath: indexPath)
+    }
 }
 
