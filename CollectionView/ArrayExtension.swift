@@ -8,3 +8,22 @@ extension Array {
 		return nil
 	}
 }
+
+extension Array {
+    func any (test:(Element)->Bool ) -> Bool {
+        for element in self {
+            if test(element) { return true }
+        }
+        return false
+    }
+}
+
+
+extension Dictionary {
+    func any (test:(Value)->Bool ) -> Key? {
+        for (key,value) in self {
+            if test(value) { return key }
+        }
+        return nil
+    }
+}
