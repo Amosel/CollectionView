@@ -2,30 +2,20 @@ import UIKit
 
 struct SectionDescription {
 	typealias Item = (size: CGSize, parents: NSIndexSet)
-	var offset: CGFloat {
-		didSet {
-			self.recalculateSize()
-		}
-	}
+	let offset: CGFloat
 	var size: CGSize = CGSizeZero
 	var itemPadding: CGFloat = 40
-	var items: [Item] {
-		didSet {
-			self.recalculateSize()
-		}
-	}
+	let items: [Item]
+    
 	init(offset: CGFloat = 0.0, items: [Item] = [Item]()) {
 		self.offset = offset
 		self.items = items
-		self.recalculateSize()
+        self.size = self.items.reduce(CGSizeZero) { accum, item in
+            return CGSize(width: max(item.size.width, accum.width), height: accum.height + item.size.height + self.itemPadding)
+        }
 	}
 	var maxX: CGFloat { return offset + size.width }
-
-	mutating func recalculateSize() {
-		self.size = self.items.reduce(CGSizeZero) { accum, item in
-			return CGSize(width: max(item.size.width, accum.width), height: accum.height + item.size.height + self.itemPadding)
-		}
-	}
+    
 	func frameForItemAtIndex(index: Int) -> CGRect {
 		let indexFloat = CGFloat(index)
 		let previousNodeSizes = self.items[0..<index].reduce(0.0) { accum, item in accum + item.size.height }
