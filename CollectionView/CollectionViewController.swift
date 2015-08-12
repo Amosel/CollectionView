@@ -46,7 +46,7 @@ class CollectionViewController: UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) ->
         UICollectionReusableView
     {
-        return self.collectionView!.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: SchematicLayout.connectorViewKind, forIndexPath: indexPath)
+        return self.collectionView!.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: SchematicConnectorView.viewReuseIdentifier, forIndexPath: indexPath)
     }
 }
 
