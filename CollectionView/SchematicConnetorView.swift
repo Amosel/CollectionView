@@ -9,7 +9,17 @@ class SchematicConnectorView : UICollectionReusableView {
     var shapeLayer: CAShapeLayer {
         return self.layer as! CAShapeLayer
     }
-    // ... INITILIZATION STRIPPED ...
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        sharedInit()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        sharedInit()
+    }
+    
     func sharedInit() {
         self.opaque = true
         self.shapeLayer.fillColor = nil
