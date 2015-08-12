@@ -5,25 +5,50 @@ class Node : Hashable, Equatable {
 		self.nodeType = type
 		self.name = name
 		self.children = createChildren()
+        onChildrenChanged(self.children, old: Set<Node>())
 	}
 	init(name:String, type:NodeType) {
 		self.nodeType = type
 		self.name = name
+        self.children = Set<Node>()
 	}
 	let name:String
-	enum NodeType {
-		case Normal
-		case Important
-		case Critical
-	}
+    enum NodeType : Int {
+        case Normal = 1
+        case Important = 2
+        case Critical = 3
+    }
 	let nodeType:NodeType
-	var parent:Node?
-	var children = Set<Node>()
-	var hashValue: Int {
-		get {
-			return (self.name.hashValue << 16) + (self.children.reduce(Int()) { return $0 + $1.hashValue} << 8)
-		}
-	}
+    
+    // setting the parent should be possible only internally.
+    // do not set the parent extenally.
+    weak var parent:Node? {
+        didSet {
+            parentHash = self.parent?.hashValue ?? 0
+        }
+    }
+    
+    func onChildrenChanged(new:Set<Node>,old:Set<Node>) {
+        for child in old.filter( {!new.contains($0)} ) {
+            child.parent = nil
+        }
+        for child in new {
+            child.parent = self
+        }
+    }
+    
+    var children : Set<Node> {
+        didSet {
+            onChildrenChanged(children, old: oldValue)
+        }
+    }
+    var parentHash:Int = 0
+    
+    var hashValue: Int {
+        get {
+            return parentHash ^  self.children.hashValue ^ nodeType.hashValue ^ (name.hashValue << 8)
+        }
+    }
     
     func walk(level:Int, @noescape visit:(node:Node,level:Int)->()) {
         visit(node: self,level: level)
@@ -38,6 +63,6 @@ class Node : Hashable, Equatable {
 }
 
 func ==(lhs:Node, rhs:Node) -> Bool {
-	return lhs.nodeType == rhs.nodeType && lhs.name == rhs.name && lhs.parent == rhs.parent && lhs.children == rhs.children
+    return lhs.hashValue == rhs.hashValue
 }
 
