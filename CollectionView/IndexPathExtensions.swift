@@ -34,6 +34,24 @@ extension NSIndexPath : IndexPath {
 }
 
 extension NSIndexPath {
+    
+    convenience init(path:[Int]) {
+        let buffer = UnsafeMutablePointer<Int>.alloc(path.count)
+        for (index,pathElement) in path.enumerate() {
+            buffer[index] = pathElement
+        }
+        self.init(indexes: buffer, length: path.count)
+    }
+    
+    convenience init(rowIndex: Int, sectionIndex: Int) {
+        let path = [rowIndex, sectionIndex]
+        let buffer = UnsafeMutablePointer<Int>.alloc(path.count)
+        for (index,pathElement) in path.enumerate() {
+            buffer[index] = pathElement
+        }
+        self.init(indexes: buffer, length: path.count)
+    }
+
     public subscript (subrange: Range<Int>) -> NSIndexPath? {
         
         guard subrange.startIndex >= 0 else {
