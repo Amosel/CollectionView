@@ -60,6 +60,19 @@ class Node : Hashable, Equatable {
     func walk(@noescape visit:(node:Node, level:Int) -> ()) {
         walk(0, visit: visit)
     }
+    
+    var groupByLevel : [Int:[Node]]  {
+        var mutable = [Int:[Node]]()
+        walk { node, level in
+            if var nodes:[Node] = mutable[level] {
+                nodes.append(node)
+            } else {
+                mutable[level] = [node]
+            }
+        }
+        return mutable
+    }
+
 }
 
 func ==(lhs:Node, rhs:Node) -> Bool {
