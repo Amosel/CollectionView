@@ -17,7 +17,7 @@ class CollectionViewLayout : UICollectionViewLayout {
 				for (sectionIndex, nodes) in dataController.sections.enumerate() {
 					let sectionIndexFloat = CGFloat(sectionIndex)
 					let offset = sectionMargin + (sectionIndexFloat * self.nodeSize.width) + (sectionIndexFloat * self.sectionPadding)
-					let sectionInfo = SectionDescription(offset: offset, items: nodes.map { node in
+					let sectionInfo = SectionDescription(index: sectionIndex, offset: offset, items: nodes.map { node in
 						let indexSet = NSMutableIndexSet()
 						if sectionIndex > 0
 						{
