@@ -9,18 +9,30 @@ extension Array {
 	}
 }
 
-extension Array {
-    func any (test:(Element)->Bool ) -> Bool {
+extension SequenceType where Self.Generator.Element : Equatable {
+    
+    func any (test:(Self.Generator.Element)->Bool ) -> Bool {
         for element in self {
             if test(element) { return true }
         }
         return false
     }
-    func count(test:(Element)->Bool ) -> Int {
+
+    func count(test:(Self.Generator.Element)->Bool ) -> Int {
         return reduce(0) { if test($1) { return $0 + 1 } else { return $0 } }
     }
-}
 
+    func countToken <T:Hashable> (test:(Self.Generator.Element)->T ) -> Int {
+        return reduce([T]()) {(var sum, let item) in
+            let token = test(item)
+            if !sum.contains( token )
+            {
+                sum.append(token)
+            }
+            return sum
+        }.count
+    }
+}
 
 extension Dictionary {
     func any (test:(Value)->Bool ) -> Key? {
@@ -38,8 +50,8 @@ extension CollectionType {
         typealias Bundle = [Key:[Element]]
         return reduce(Bundle()) { (var bundle, element) in
             let key = fn(element)
-            if bundle[key] != nil {
-                bundle[key]!.append(element)
+            if var array = bundle[key] {
+                array.append(element)
             } else {
                 bundle[key] = [element]
             }
@@ -52,13 +64,26 @@ extension CollectionType {
         typealias Bundle = [Key:[NewElement]]
         return reduce(Bundle()) { (var bundle, element) in
             let (key, newElement) = fn(element)
-            if bundle[key] != nil {
-                bundle[key]!.append(newElement)
+            if var array = bundle[key] {
+                array.append(newElement)
             } else {
                 bundle[key] = [newElement]
             }
             return bundle
         }
     }
+    
+    func groupBy<Key : Hashable, NewKey: Hashable,NewValue >(fn:(Element)->(Key,NewKey,NewValue)) -> [Key:[NewKey : NewValue]] {
+        typealias Bundle = [Key:[NewKey : NewValue]]
+        return reduce(Bundle()) { (var bundle, element) in
+            let (key, newKey, newValue) = fn(element)
+            if var dictionary = bundle[key] {
+                dictionary[newKey] = newValue
+            } else {
+                bundle[key] = [newKey : newValue]
+            }
+            return bundle
+        }
+    }    
 }
 
