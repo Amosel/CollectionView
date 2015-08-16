@@ -1,24 +1,12 @@
 import Foundation
 
 protocol IndexPath {
-    var sectionIndex: Int { get}
-    var rowIndex : Int { get }
-    static func new(rowIndex:Int, sectionIndex: Int) -> IndexPath
+    var section: Int { get}
+    var row : Int { get }
+    static func new(row:Int, section: Int) -> IndexPath
 }
 
 extension NSIndexPath : IndexPath {
-    
-    var sectionIndex : Int {
-        get {
-            return indexAtPosition(0)
-        }
-    }
-    
-    var rowIndex:Int {
-        get {
-            return indexAtPosition(1)
-        }
-    }
     
     static func new(path:[Int]) -> NSIndexPath {
         let buffer = UnsafeMutablePointer<Int>.alloc(path.count)
@@ -28,8 +16,8 @@ extension NSIndexPath : IndexPath {
         return NSIndexPath(indexes: buffer, length: path.count)
     }
 
-    static func new(rowIndex: Int, sectionIndex: Int) -> IndexPath {
-        return new([rowIndex, sectionIndex])
+    static func new(row: Int, section: Int) -> IndexPath {
+        return new([section, row])
     }
 }
 
@@ -43,8 +31,8 @@ extension NSIndexPath {
         self.init(indexes: buffer, length: path.count)
     }
     
-    convenience init(rowIndex: Int, sectionIndex: Int) {
-        let path = [rowIndex, sectionIndex]
+    convenience init(row: Int, section: Int) {
+        let path = [section, row]
         let buffer = UnsafeMutablePointer<Int>.alloc(path.count)
         for (index,pathElement) in path.enumerate() {
             buffer[index] = pathElement
@@ -86,17 +74,22 @@ extension NSIndexPath {
 
 extension SequenceType where Self.Generator.Element : IndexPath {
 
-    func indexesInSection(section:Int) -> [Self.Generator.Element] {
-        return self.filter { $0.sectionIndex == section }
+    func indexPathsInSection(section:Int) -> [Self.Generator.Element] {
+        let indexPaths = self.filter {
+            $0.section == section
+        }
+        return indexPaths
     }
     func lastIndexPathInSection(section:Int) -> Self.Generator.Element {
-        return indexesInSection(section).last ?? Self.Generator.Element.new(0, sectionIndex: section) as! Self.Generator.Element
+        return indexPathsInSection(section)
+            .last ?? Self.Generator.Element.new(0, section: section) as! Self.Generator.Element
     }
     func nextRowAtSection(section:Int) -> Int {
-        return indexesInSection(section).last?.rowIndex ?? 0
+        return self.filter { section == $0.section }.reduce(Int(0)) { max($0, $1.row + 1) }
     }
     func nextIndexPathInSection(section:Int) -> Self.Generator.Element {
-        return Self.Generator.Element.new(0, sectionIndex: section) as! Self.Generator.Element
+        let nextRow = nextRowAtSection(section)
+        return Self.Generator.Element.new(nextRow, section: section) as! Self.Generator.Element
     }
 }
 
