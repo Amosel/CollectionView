@@ -30,17 +30,23 @@ class CollectionViewController: UICollectionViewController {
         }
     }
 
+    var sectionsMap:SchematicDataController.SectionMap? {
+        get {
+            return dataController?.sectionsMap
+        }
+    }
+    
 	override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-		return self.dataController?.sections.count ?? 0
+		return sectionsMap?.numberOfSections ?? 0
 	}
 	override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		return self.dataController?.sections[section].count ?? 0
+		return sectionsMap?.numberOfRowsInSection(section) ?? 0
 	}
 
 	override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell
 	{
 		let cell = collectionView.dequeueReusableCellWithReuseIdentifier(SchematicNodeCell.cellReuseIdentifier, forIndexPath: indexPath) as! SchematicNodeCell
-		cell.node = self.dataController?.nodeAtIndexPath(indexPath)
+		cell.node = sectionsMap?.nodeAtIndexPath(indexPath)
 		return cell
 	}
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) ->
