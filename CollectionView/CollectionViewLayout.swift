@@ -1,16 +1,16 @@
 import UIKit
 
-protocol SectionGeometry {
+protocol CollectionGeometry {
     var sectionMargin:CGFloat { get }
     var nodeSize:CGSize { get }
     var sectionPadding:CGFloat { get }
 }
 
-func transform(sections:[[Node]]?, geometry:SectionGeometry, toItems:(Int,Node)->SectionDescription.Item) -> [SectionDescription] {
+func transform(sections:[[Node]]?, geometry:CollectionGeometry, toItems:(Int,Node)->[SectionDescription.Item]) -> [SectionDescription] {
     return sections?.mapWithIndex { (sectionIndex, nodes) in
         let sectionIndexFloat = CGFloat(sectionIndex)
         let offset = geometry.sectionMargin + (sectionIndexFloat * geometry.nodeSize.width) + (sectionIndexFloat * geometry.sectionPadding)
-        let items:[SectionDescription.Item] = nodes.mapWithIndex(toItems)
+        let items:[SectionDescription.Item] = nodes.flatMapWithIndex(toItems)
         return SectionDescription(index: sectionIndex, offset: offset, items: items)
     } ?? []
 }
@@ -19,7 +19,7 @@ func transform(sections:[[Node]]?, geometry:SectionGeometry, toItems:(Int,Node)-
 class CollectionViewLayout : UICollectionViewLayout {
 	var sectionDescriptions:[SectionDescription]?
 	var dataController : SchematicDataController?
-    struct Geometry : SectionGeometry {
+    struct Geometry : CollectionGeometry {
         var sectionMargin:CGFloat = 12
         var nodeSize = CGSizeMake(100, 100)
         var sectionPadding:CGFloat = 30
@@ -36,10 +36,10 @@ class CollectionViewLayout : UICollectionViewLayout {
         self.sectionDescriptions = transform(dataController?.sections, geometry: geometry, toItems: { (sectionIndex, node) in
             let indexSet = NSMutableIndexSet()
             guard let parent = node.parent, indexPath = self.dataController!.indexPathForNode(parent) else {
-                return (size: self.geometry.nodeSize, parents: indexSet)
+                return [(size: self.geometry.nodeSize, parents: indexSet)]
             }
             indexSet.addIndex(indexPath.item)
-            return (size: self.geometry.nodeSize, parents: indexSet)
+            return [(size: self.geometry.nodeSize, parents: indexSet)]
         })
     }
 	// we need to cache all the layout information (in the SectionDescription struct is in order to get the content size for the scroll view.
