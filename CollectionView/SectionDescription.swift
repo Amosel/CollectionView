@@ -1,9 +1,5 @@
 import UIKit
 
-protocol HasSize {
-    var size:CGSize { get }
-}
-
 struct SectionDescription <T:HasSize> {
     typealias Item = T
     let index: Int

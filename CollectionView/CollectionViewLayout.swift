@@ -11,6 +11,10 @@ protocol Child {
     var parent :Parent { get }
 }
 
+protocol HasSize {
+    var size:CGSize { get }
+}
+
 enum SchematicItem : HasSize {
     case Normal(CGSize, NSIndexSet)
     case Connector(CGSize)
@@ -31,8 +35,6 @@ enum SchematicItem : HasSize {
         }
     }
 }
-
-typealias SchematicSection = SectionDescription<SchematicItem>
 
 func transform<T: HasSize> (sections:[[Node]]?, geometry:CollectionGeometry, toItems:(Int,Node)->[T]) -> [SectionDescription<T>] {
     return sections?.mapWithIndex { (sectionIndex, nodes) in
