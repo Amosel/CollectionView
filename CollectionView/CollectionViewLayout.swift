@@ -1,46 +1,54 @@
 import UIKit
 
-// 
+protocol SectionGeometry {
+    var sectionMargin:CGFloat { get }
+    var nodeSize:CGSize { get }
+    var sectionPadding:CGFloat { get }
+}
+
+func transform(sections:[[Node]]?, geometry:SectionGeometry, toItems:(Int,Node)->SectionDescription.Item) -> [SectionDescription] {
+    return sections?.mapWithIndex { (sectionIndex, nodes) in
+        let sectionIndexFloat = CGFloat(sectionIndex)
+        let offset = geometry.sectionMargin + (sectionIndexFloat * geometry.nodeSize.width) + (sectionIndexFloat * geometry.sectionPadding)
+        let items:[SectionDescription.Item] = nodes.mapWithIndex(toItems)
+        return SectionDescription(index: sectionIndex, offset: offset, items: items)
+    } ?? []
+}
+
+//
 class CollectionViewLayout : UICollectionViewLayout {
 	var sectionDescriptions:[SectionDescription]?
 	var dataController : SchematicDataController?
-	var sectionMargin:CGFloat = 12
-	var nodeSize = CGSizeMake(100, 100)
-	var sectionPadding:CGFloat = 30
-
-	// here the data we are dealing with is static, so the section description is only populated once.
-	// when the data controller sections change, the section description should change too.
-	override func prepareLayout() {
-		if self.sectionDescriptions == nil {
-			var mutable = [SectionDescription]()
-			if let dataController = self.dataController {
-				for (sectionIndex, nodes) in dataController.sections.enumerate() {
-					let sectionIndexFloat = CGFloat(sectionIndex)
-					let offset = sectionMargin + (sectionIndexFloat * self.nodeSize.width) + (sectionIndexFloat * self.sectionPadding)
-					let sectionInfo = SectionDescription(index: sectionIndex, offset: offset, items: nodes.map { node in
-						let indexSet = NSMutableIndexSet()
-						if sectionIndex > 0
-						{
-							if let parent = node.parent, indexPath = dataController.indexPathForNode(parent) where indexPath.section == sectionIndex - 1
-							{
-								indexSet.addIndex(indexPath.item)
-							}
-						}
-      					return (size: self.nodeSize, parents: indexSet)
-					})
-					mutable.append(sectionInfo)
-    			}
-			}
-			sectionDescriptions = mutable
-		}
-	}
+    struct Geometry : SectionGeometry {
+        var sectionMargin:CGFloat = 12
+        var nodeSize = CGSizeMake(100, 100)
+        var sectionPadding:CGFloat = 30
+    }
+    var geometry = Geometry() {
+        didSet {
+            self.invalidateLayout()
+        }
+    }
+    
+    override func prepareLayout() {
+        // here the data we are dealing with is static, so the section description is only populated once.
+        // when the data controller sections change, the section description should change too.
+        self.sectionDescriptions = transform(dataController?.sections, geometry: geometry, toItems: { (sectionIndex, node) in
+            let indexSet = NSMutableIndexSet()
+            guard let parent = node.parent, indexPath = self.dataController!.indexPathForNode(parent) else {
+                return (size: self.geometry.nodeSize, parents: indexSet)
+            }
+            indexSet.addIndex(indexPath.item)
+            return (size: self.geometry.nodeSize, parents: indexSet)
+        })
+    }
 	// we need to cache all the layout information (in the SectionDescription struct is in order to get the content size for the scroll view.
 	// we use the offset and size information of the section description to calculate the content size.
 	override func collectionViewContentSize() -> CGSize {
 		if let _ = self.dataController, sectionDescriptions = self.sectionDescriptions {
 			var width: CGFloat = 0.0
 			if let lastSection = sectionDescriptions.last {
-			    width = lastSection.maxX + self.sectionMargin
+			    width = lastSection.maxX + geometry.sectionMargin
 			}
 			let height = sectionDescriptions.map{ $0.size.height }.reduce(0.0,combine: max)
 			return CGSize(width: width, height: height)
