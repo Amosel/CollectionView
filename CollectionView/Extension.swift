@@ -18,6 +18,14 @@ extension SequenceType {
         }
         return mutable
     }
+    func flatMapWithIndex<T>(transform:(Int,Self.Generator.Element)->[T]) -> [T] {
+        var mutable = [T]()
+        for (index, element) in self.enumerate() {
+            let new = transform(index, element)
+            mutable += new
+        }
+        return mutable
+    }
 }
 
 
