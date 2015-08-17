@@ -6,7 +6,35 @@ protocol CollectionGeometry {
     var sectionPadding:CGFloat { get }
 }
 
-func transform(sections:[[Node]]?, geometry:CollectionGeometry, toItems:(Int,Node)->[SectionDescription.Item]) -> [SectionDescription] {
+protocol Child {
+    typealias Parent
+    var parent :Parent { get }
+}
+
+enum SchematicItem : HasSize {
+    case Normal(CGSize, NSIndexSet)
+    case Connector(CGSize)
+    var size:CGSize {
+        switch self {
+        case .Normal(let size, _):
+            return size
+        case .Connector(let size):
+            return size
+        }
+    }
+    var parents:NSIndexSet {
+        switch self {
+        case .Normal(_, let parents):
+            return parents
+        default:
+            return NSIndexSet()
+        }
+    }
+}
+
+typealias SchematicSection = SectionDescription<SchematicItem>
+
+func transform<T: HasSize> (sections:[[Node]]?, geometry:CollectionGeometry, toItems:(Int,Node)->[T]) -> [SectionDescription<T>] {
     return sections?.mapWithIndex { (sectionIndex, nodes) in
         let sectionIndexFloat = CGFloat(sectionIndex)
         let offset = geometry.sectionMargin + (sectionIndexFloat * geometry.nodeSize.width) + (sectionIndexFloat * geometry.sectionPadding)
@@ -15,9 +43,14 @@ func transform(sections:[[Node]]?, geometry:CollectionGeometry, toItems:(Int,Nod
     } ?? []
 }
 
+func transform<T:HasSize>(sections:[SectionDescription<T>]) -> [UICollectionViewLayoutAttributes] {
+    return []
+}
+
 //
 class CollectionViewLayout : UICollectionViewLayout {
-	var sectionDescriptions:[SectionDescription]?
+    typealias SectionType = SectionDescription<SchematicItem>
+	var sectionDescriptions:[SectionType]?
 	var dataController : SchematicDataController?
     struct Geometry : CollectionGeometry {
         var sectionMargin:CGFloat = 12
@@ -36,10 +69,10 @@ class CollectionViewLayout : UICollectionViewLayout {
         self.sectionDescriptions = transform(dataController?.sections, geometry: geometry, toItems: { (sectionIndex, node) in
             let indexSet = NSMutableIndexSet()
             guard let parent = node.parent, indexPath = self.dataController!.indexPathForNode(parent) else {
-                return [(size: self.geometry.nodeSize, parents: indexSet)]
+                return [.Normal(self.geometry.nodeSize,indexSet)]
             }
             indexSet.addIndex(indexPath.item)
-            return [(size: self.geometry.nodeSize, parents: indexSet)]
+            return [.Normal(self.geometry.nodeSize,indexSet)]
         })
     }
 	// we need to cache all the layout information (in the SectionDescription struct is in order to get the content size for the scroll view.
@@ -56,8 +89,20 @@ class CollectionViewLayout : UICollectionViewLayout {
 		return super.collectionViewContentSize()
 	}
 
+    func sectionsInRect(rect:CGRect) -> [SectionType] {
+        return self.sectionDescriptions?.filter { $0.offset >= rect.minX && $0.offset <= rect.maxX } ?? []
+    }
 	override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-		var attributes = [UICollectionViewLayoutAttributes]()
+#if false
+        return sectionsInRect(rect).flatMapWithIndex {sectionIndex, section -> [UICollectionViewLayoutAttributes] in
+            return section.itemIndexesInRect(rect)
+                // get the indexPaths
+                .map { NSIndexPath(row: $0, section: sectionIndex) }
+                // removes the optionsals:
+                .flatMap(self.layoutAttributesForItemAtIndexPath)
+        }
+#else
+        var attributes = [UICollectionViewLayoutAttributes]()
 		if let sectionDescriptions = self.sectionDescriptions {
 			attributes += sectionDescriptions.enumerate().flatMap {
 				sectionIndex, section -> [UICollectionViewLayoutAttributes] in
@@ -86,7 +131,8 @@ class CollectionViewLayout : UICollectionViewLayout {
 				return items
 			}
 		}
-		return attributes
+        return attributes
+#endif
 	}
 
 	override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {

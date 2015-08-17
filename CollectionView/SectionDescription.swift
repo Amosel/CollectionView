@@ -1,7 +1,11 @@
 import UIKit
 
-struct SectionDescription {
-    typealias Item = (size: CGSize, parents: NSIndexSet)
+protocol HasSize {
+    var size:CGSize { get }
+}
+
+struct SectionDescription <T:HasSize> {
+    typealias Item = T
     let index: Int
     let offset: CGFloat
     var size: CGSize = CGSizeZero
