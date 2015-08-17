@@ -20,6 +20,7 @@
 		6C50B73D1B7925E700E6899C /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50B73C1B7925E700E6899C /* Node.swift */; };
 		6C50B73F1B79261000E6899C /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50B73E1B79261000E6899C /* Extension.swift */; };
 		E6384CF01B794DC40001A395 /* SchematicConnetorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6384CEF1B794DC40001A395 /* SchematicConnetorView.swift */; };
+		E66B0AD41B81A6C70014878E /* IndexPathMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66B0AD31B81A6C70014878E /* IndexPathMap.swift */; };
 		E6891FDA1B80BE410052B643 /* IndexPathExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6891FD91B80BE410052B643 /* IndexPathExtensions.swift */; };
 		E6F45EC21B7B215200E78786 /* SchematicLayoutInvalidationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F45EC11B7B215200E78786 /* SchematicLayoutInvalidationContext.swift */; };
 /* End PBXBuildFile section */
@@ -32,7 +33,7 @@
 		6C50B7251B78D1CE00E6899C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6C50B7281B78D1CE00E6899C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6C50B72A1B78D1CE00E6899C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6C50B7301B78D26F00E6899C /* SchematicDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchematicDataController.swift; sourceTree = "<group>"; };
+		6C50B7301B78D26F00E6899C /* SchematicDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SchematicDataController.swift; sourceTree = "<group>"; };
 		6C50B7321B78DA1300E6899C /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		6C50B7331B78F93C00E6899C /* SectionDescription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionDescription.swift; sourceTree = "<group>"; };
 		6C50B7351B78FDE700E6899C /* CollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewLayout.swift; sourceTree = "<group>"; };
@@ -41,6 +42,7 @@
 		6C50B73C1B7925E700E6899C /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		6C50B73E1B79261000E6899C /* Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		E6384CEF1B794DC40001A395 /* SchematicConnetorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchematicConnetorView.swift; sourceTree = "<group>"; };
+		E66B0AD31B81A6C70014878E /* IndexPathMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndexPathMap.swift; sourceTree = "<group>"; };
 		E6891FD91B80BE410052B643 /* IndexPathExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IndexPathExtensions.swift; sourceTree = "<group>"; };
 		E6F45EC11B7B215200E78786 /* SchematicLayoutInvalidationContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchematicLayoutInvalidationContext.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -81,6 +83,7 @@
 				6C50B73C1B7925E700E6899C /* Node.swift */,
 				E6F45EC01B7B212E00E78786 /* Layout */,
 				6C50B7301B78D26F00E6899C /* SchematicDataController.swift */,
+				E66B0AD31B81A6C70014878E /* IndexPathMap.swift */,
 				E6384CEF1B794DC40001A395 /* SchematicConnetorView.swift */,
 				6C50B71E1B78D1CE00E6899C /* CollectionViewController.swift */,
 				6C50B7371B79259B00E6899C /* SchematicNodeCell.swift */,
@@ -182,6 +185,7 @@
 				6C50B71D1B78D1CE00E6899C /* AppDelegate.swift in Sources */,
 				E6384CF01B794DC40001A395 /* SchematicConnetorView.swift in Sources */,
 				6C50B7341B78F93C00E6899C /* SectionDescription.swift in Sources */,
+				E66B0AD41B81A6C70014878E /* IndexPathMap.swift in Sources */,
 				E6F45EC21B7B215200E78786 /* SchematicLayoutInvalidationContext.swift in Sources */,
 				E6891FDA1B80BE410052B643 /* IndexPathExtensions.swift in Sources */,
 				6C50B7361B78FDE700E6899C /* CollectionViewLayout.swift in Sources */,
