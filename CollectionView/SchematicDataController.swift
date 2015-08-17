@@ -1,19 +1,39 @@
 import UIKit
 
+func transform(tree:Node?) -> IndexPathMap<Node> {
+    return IndexPathMap<Node> {
+        var mutable = [NSIndexPath : Node]()
+        tree?.walk({ (node, level) -> () in
+            let indexPath = mutable.keys.nextIndexPathInSection(level)
+            mutable[indexPath] = node
+        })
+        return mutable
+    }
+}
+
+func transform(tree:Node?) -> [[Node]] {
+    var nodes = [[Node]]()
+    tree?.walk({ (node, level) -> () in
+        if nodes.count > level {
+            nodes[level] = nodes[level]+[node]
+        } else {
+            nodes.append([node])
+        }
+    })
+    return nodes
+}
+
 class SchematicDataController : NSObject {
+    
+    typealias SectionMap = IndexPathMap<Node>
+    var sectionsMap = SectionMap { () -> ([NSIndexPath : Node]) in
+        return [:]
+    }
+    
     var tree: Node? {
         didSet {
-            var nodes = [[Node]]()
-            if let tree = tree {
-                tree.walk({ (node, level) -> () in
-                    if nodes.count > level {
-                        nodes[level] = nodes[level]+[node]
-                    } else {
-                        nodes.append([node])
-                    }
-                })
-            }
-            sections = nodes
+            sectionsMap = transform(tree)
+            sections = transform(tree)
         }
     }
 	var sections = [[Node]]()
