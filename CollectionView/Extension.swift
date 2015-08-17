@@ -9,6 +9,18 @@ extension Array {
 	}
 }
 
+extension SequenceType {
+    func mapWithIndex<T>(transform:(Int,Self.Generator.Element)->T) -> [T] {
+        var mutable = [T]()
+        for (index, element) in self.enumerate() {
+            let new = transform(index, element)
+            mutable.append(new)
+        }
+        return mutable
+    }
+}
+
+
 extension SequenceType where Self.Generator.Element : Equatable {
     
     func any (test:(Self.Generator.Element)->Bool ) -> Bool {
