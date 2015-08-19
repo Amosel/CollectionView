@@ -1,9 +1,10 @@
 import UIKit
 
-protocol CollectionGeometry {
+protocol CollectionViewLayoutMetrics {
     var sectionMargin:CGFloat { get }
     var nodeSize:CGSize { get }
     var sectionPadding:CGFloat { get }
+    init()
 }
 
 protocol Child {
@@ -36,7 +37,7 @@ enum SchematicItem : HasSize {
     }
 }
 
-func transform<T: HasSize> (sections:[[Node]]?, geometry:CollectionGeometry, toItems:(Int,Node)->[T]) -> [SectionDescription<T>] {
+func transform<T: HasSize> (sections:[[Node]]?, geometry:CollectionViewLayoutMetrics, toItems:(Int,Node)->[T]) -> [SectionDescription<T>] {
     return sections?.mapWithIndex { (sectionIndex, nodes) in
         let sectionIndexFloat = CGFloat(sectionIndex)
         let offset = geometry.sectionMargin + (sectionIndexFloat * geometry.nodeSize.width) + (sectionIndexFloat * geometry.sectionPadding)
@@ -49,17 +50,19 @@ func transform<T:HasSize>(sections:[SectionDescription<T>]) -> [UICollectionView
     return []
 }
 
+struct Metrics : CollectionViewLayoutMetrics{
+    var sectionMargin:CGFloat = 12
+    var nodeSize = CGSizeMake(100, 100)
+    var sectionPadding:CGFloat = 30
+    init() {}
+}
+
 //
 class CollectionViewLayout : UICollectionViewLayout {
     typealias SectionType = SectionDescription<SchematicItem>
 	var sectionDescriptions:[SectionType]?
 	var dataController : SchematicDataController?
-    struct Geometry : CollectionGeometry {
-        var sectionMargin:CGFloat = 12
-        var nodeSize = CGSizeMake(100, 100)
-        var sectionPadding:CGFloat = 30
-    }
-    var geometry = Geometry() {
+    var geometry = Metrics() {
         didSet {
             self.invalidateLayout()
         }

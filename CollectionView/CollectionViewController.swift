@@ -14,14 +14,16 @@ class CollectionViewController: UICollectionViewController {
 		super.viewWillAppear(animated)
 	}
 
+    typealias Layout = CollectionViewLayout
+    
 	var dataController:SchematicDataController? {
 		didSet {
-			let layout = CollectionViewLayout()
+			let layout = Layout()
 			layout.dataController = dataController
 			self.layout = layout
 		}
 	}
-    var layout:CollectionViewLayout? {
+    var layout:Layout? {
         didSet {
             if let layout = layout {
                 self.collectionView?.collectionViewLayout = layout
