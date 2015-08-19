@@ -37,10 +37,10 @@ enum SchematicItem : HasSize {
     }
 }
 
-func transform<T: HasSize> (sections:[[Node]]?, geometry:CollectionViewLayoutMetrics, toItems:(Int,Node)->[T]) -> [SectionDescription<T>] {
+func transform<T: HasSize> (sections:[[Node]]?, metrics:CollectionViewLayoutMetrics, toItems:(Int,Node)->[T]) -> [SectionDescription<T>] {
     return sections?.mapWithIndex { (sectionIndex, nodes) in
         let sectionIndexFloat = CGFloat(sectionIndex)
-        let offset = geometry.sectionMargin + (sectionIndexFloat * geometry.nodeSize.width) + (sectionIndexFloat * geometry.sectionPadding)
+        let offset = metrics.sectionMargin + (sectionIndexFloat * metrics.nodeSize.width) + (sectionIndexFloat * metrics.sectionPadding)
         let items:[SectionDescription.Item] = nodes.flatMapWithIndex(toItems)
         return SectionDescription(index: sectionIndex, offset: offset, items: items)
     } ?? []
@@ -50,19 +50,19 @@ func transform<T:HasSize>(sections:[SectionDescription<T>]) -> [UICollectionView
     return []
 }
 
-struct Metrics : CollectionViewLayoutMetrics{
-    var sectionMargin:CGFloat = 12
-    var nodeSize = CGSizeMake(100, 100)
-    var sectionPadding:CGFloat = 30
-    init() {}
-}
-
 //
-class CollectionViewLayout : UICollectionViewLayout {
+class CollectionViewLayout <M:CollectionViewLayoutMetrics> : UICollectionViewLayout {
     typealias SectionType = SectionDescription<SchematicItem>
+    typealias Metrics = M
+    
+    override init() {
+        super.init()
+    }
+    
 	var sectionDescriptions:[SectionType]?
-	var dataController : SchematicDataController?
-    var geometry = Metrics() {
+    var dataController : SchematicDataController?
+    var metrics:Metrics = Metrics()
+    {
         didSet {
             self.invalidateLayout()
         }
@@ -71,13 +71,13 @@ class CollectionViewLayout : UICollectionViewLayout {
     override func prepareLayout() {
         // here the data we are dealing with is static, so the section description is only populated once.
         // when the data controller sections change, the section description should change too.
-        self.sectionDescriptions = transform(dataController?.sections, geometry: geometry, toItems: { (sectionIndex, node) in
+        self.sectionDescriptions = transform(dataController?.sections, metrics: metrics, toItems: { (sectionIndex, node) in
             let indexSet = NSMutableIndexSet()
             guard let parent = node.parent, indexPath = self.dataController!.indexPathForNode(parent) else {
-                return [.Normal(self.geometry.nodeSize,indexSet)]
+                return [.Normal(self.metrics.nodeSize,indexSet)]
             }
             indexSet.addIndex(indexPath.item)
-            return [.Normal(self.geometry.nodeSize,indexSet)]
+            return [.Normal(self.metrics.nodeSize,indexSet)]
         })
     }
 	// we need to cache all the layout information (in the SectionDescription struct is in order to get the content size for the scroll view.
@@ -86,7 +86,7 @@ class CollectionViewLayout : UICollectionViewLayout {
 		if let _ = self.dataController, sectionDescriptions = self.sectionDescriptions {
 			var width: CGFloat = 0.0
 			if let lastSection = sectionDescriptions.last {
-			    width = lastSection.maxX + geometry.sectionMargin
+			    width = lastSection.maxX + metrics.sectionMargin
 			}
 			let height = sectionDescriptions.map{ $0.size.height }.reduce(0.0,combine: max)
 			return CGSize(width: width, height: height)

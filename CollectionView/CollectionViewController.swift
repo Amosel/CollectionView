@@ -1,5 +1,13 @@
 import UIKit
 
+struct Metrics : CollectionViewLayoutMetrics{
+    var sectionMargin:CGFloat = 12
+    var nodeSize = CGSizeMake(100, 100)
+    var sectionPadding:CGFloat = 30
+    init() {}
+}
+
+
 class CollectionViewController: UICollectionViewController {
 
 	override func viewDidLoad() {
@@ -14,7 +22,7 @@ class CollectionViewController: UICollectionViewController {
 		super.viewWillAppear(animated)
 	}
 
-    typealias Layout = CollectionViewLayout
+    typealias Layout = CollectionViewLayout<Metrics>
     
 	var dataController:SchematicDataController? {
 		didSet {
