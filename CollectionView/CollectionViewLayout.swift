@@ -97,47 +97,33 @@ class CollectionViewLayout <M:CollectionViewLayoutMetrics> : UICollectionViewLay
     func sectionsInRect(rect:CGRect) -> [SectionType] {
         return self.sectionDescriptions?.filter { $0.offset >= rect.minX && $0.offset <= rect.maxX } ?? []
     }
+    
+    
+    func indexPathsForChildrenOfItemAtIndexPath(indexPath:NSIndexPath) -> [NSIndexPath] {
+        let sectionIndex = indexPath.section
+        let itemIndex = indexPath.item
+        let nextSectionIndex = sectionIndex + 1
+        return self.sectionDescriptions?.optionalElementAtIndex(nextSectionIndex)?.items
+            .filter { $0.parents.containsIndex(itemIndex) }
+            .mapWithIndex({ (childIndex, _) -> NSIndexPath in
+                return NSIndexPath(forItem: childIndex, inSection: nextSectionIndex)
+            }) ?? []
+    }
+    
 	override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-#if false
-        return sectionsInRect(rect).flatMapWithIndex {sectionIndex, section -> [UICollectionViewLayoutAttributes] in
+        return sectionsInRect(rect).flatMapWithIndex { sectionIndex, section -> [UICollectionViewLayoutAttributes] in
             return section.itemIndexesInRect(rect)
                 // get the indexPaths
-                .map { NSIndexPath(row: $0, section: sectionIndex) }
-                // removes the optionsals:
-                .flatMap(self.layoutAttributesForItemAtIndexPath)
+                .flatMap { itemIndex -> [UICollectionViewLayoutAttributes] in
+                    let itemIndexPath = NSIndexPath(row: itemIndex, section: sectionIndex)
+                    let itemAttributes:[UICollectionViewLayoutAttributes] = [itemIndexPath].flatMap { self.layoutAttributesForItemAtIndexPath($0) }
+                    
+                    let childrenAttributes:[UICollectionViewLayoutAttributes] = self.indexPathsForChildrenOfItemAtIndexPath(itemIndexPath)
+                        .flatMap { self.layoutAttributesForSupplementaryViewOfKind(SchematicLayout.connectorViewKind, atIndexPath: $0)}
+                    
+                    return (childrenAttributes + itemAttributes)
+            }
         }
-#else
-        var attributes = [UICollectionViewLayoutAttributes]()
-		if let sectionDescriptions = self.sectionDescriptions {
-			attributes += sectionDescriptions.enumerate().flatMap {
-				sectionIndex, section -> [UICollectionViewLayoutAttributes] in
-				var items = [UICollectionViewLayoutAttributes]()
-				if section.offset >= rect.minX && section.offset <= rect.maxX {
-					items += section.items.enumerate().flatMap {
-						itemIndex, item -> [UICollectionViewLayoutAttributes] in
-						var itemAttributes = [UICollectionViewLayoutAttributes]()
-						if rect.contains(section.frameForItemAtIndex(itemIndex)) {
-							let indexPath = NSIndexPath(forItem: itemIndex, inSection: sectionIndex)
-							itemAttributes.append(self.layoutAttributesForItemAtIndexPath(indexPath)!)
-                            // add the connector view:
-                            let nextSectionIndex = sectionIndex + 1
-                            if let nextSection = sectionDescriptions.optionalElementAtIndex(nextSectionIndex) {
-                                let children = nextSection.items.enumerate().filter() { childIndex, child in child.parents.containsIndex(itemIndex) }
-                                for (childIndex, _) in children {
-                                    let indexPath = NSIndexPath(forItem: childIndex, inSection: nextSectionIndex)
-                                    let t = self.layoutAttributesForSupplementaryViewOfKind(SchematicLayout.connectorViewKind, atIndexPath:indexPath)
-                                    itemAttributes.append(t!)
-                                }
-                            }
-						}
-						return itemAttributes
-					}
-				}
-				return items
-			}
-		}
-        return attributes
-#endif
 	}
 
 	override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
