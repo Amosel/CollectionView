@@ -162,7 +162,7 @@ class CollectionViewLayout <M:CollectionViewLayoutMetrics> : UICollectionViewLay
                 let childFrame = childSectionDescription.frameForItemAtIndex(indexPath.item)
                 for parentIndex in childSectionDescription.items[indexPath.item].parents
                 {
-                    let parentIndexPath = NSIndexPath(forItem: parentIndex, inSection: indexPath.section - 1)
+                    let parentIndexPath = NSIndexPath(row: parentIndex, section: indexPath.section - 1)
                     let parentFrame = sectionDescriptions[parentIndexPath.section].frameForItemAtIndex(parentIndexPath.item)
                     let y = min(parentFrame.midY, childFrame.midY)
                     attributes.frame = CGRect(x: parentFrame.maxX, y: y, width: abs(childFrame.minX - parentFrame.maxX), height: abs(childFrame.midY - parentFrame.midY))
