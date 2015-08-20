@@ -29,7 +29,7 @@ extension SequenceType {
 }
 
 
-extension SequenceType where Self.Generator.Element : Equatable {
+extension CollectionType where Self.Generator.Element : Equatable {
     
     func any (test:(Self.Generator.Element)->Bool ) -> Bool {
         for element in self {
