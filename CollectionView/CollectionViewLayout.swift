@@ -68,12 +68,40 @@ class CollectionViewLayout <M:CollectionViewLayoutMetrics> : UICollectionViewLay
         }
     }
     
+    func sectionsInRect(rect:CGRect) -> [SectionType]
+    {
+        return self.sectionDescriptions?.filter { $0.offset >= rect.minX && $0.offset <= rect.maxX } ?? []
+    }
+    
+    func indexPathsForItemsInRect(rect:CGRect) -> [NSIndexPath]
+    {
+        return sectionsInRect(rect).flatMapWithIndex
+            { sectionIndex, section in
+                return section.itemIndexesInRect(rect).map { NSIndexPath(row: $0, section: sectionIndex) }
+        }
+    }
+    
+    
+    func indexPathsForChildrenOfItemAtIndexPath(indexPath:NSIndexPath) -> [NSIndexPath]
+    {
+        let sectionIndex = indexPath.section
+        let itemIndex = indexPath.item
+        let nextSectionIndex = sectionIndex + 1
+        return self.sectionDescriptions?.optionalElementAtIndex(nextSectionIndex)?.items
+            .filter { $0.parents.containsIndex(itemIndex) }
+            .mapWithIndex { (childIndex, _) -> NSIndexPath in
+                return NSIndexPath(forItem: childIndex, inSection: nextSectionIndex)
+            } ?? []
+    }
+    
+
     override func prepareLayout() {
         // here the data we are dealing with is static, so the section description is only populated once.
         // when the data controller sections change, the section description should change too.
         self.sectionDescriptions = transform(dataController?.sections, metrics: metrics, toItems: { (sectionIndex, node) in
             let indexSet = NSMutableIndexSet()
-            guard let parent = node.parent, indexPath = self.dataController!.indexPathForNode(parent) else {
+            guard let parent = node.parent, indexPath = self.dataController!.indexPathForNode(parent) else
+            {
                 return [.Normal(self.metrics.nodeSize,indexSet)]
             }
             indexSet.addIndex(indexPath.item)
@@ -82,63 +110,54 @@ class CollectionViewLayout <M:CollectionViewLayoutMetrics> : UICollectionViewLay
     }
 	// we need to cache all the layout information (in the SectionDescription struct is in order to get the content size for the scroll view.
 	// we use the offset and size information of the section description to calculate the content size.
-	override func collectionViewContentSize() -> CGSize {
-		if let _ = self.dataController, sectionDescriptions = self.sectionDescriptions {
+	override func collectionViewContentSize() -> CGSize
+    {
+		if let _ = self.dataController, sectionDescriptions = self.sectionDescriptions
+        {
 			var width: CGFloat = 0.0
-			if let lastSection = sectionDescriptions.last {
+			if let lastSection = sectionDescriptions.last
+            {
 			    width = lastSection.maxX + metrics.sectionMargin
 			}
-			let height = sectionDescriptions.map{ $0.size.height }.reduce(0.0,combine: max)
+            
+			let height = sectionDescriptions.map { $0.size.height }
+                .reduce(0.0, combine: max)
+
 			return CGSize(width: width, height: height)
 		}
 		return super.collectionViewContentSize()
 	}
 
-    func sectionsInRect(rect:CGRect) -> [SectionType] {
-        return self.sectionDescriptions?.filter { $0.offset >= rect.minX && $0.offset <= rect.maxX } ?? []
-    }
-    
-    
-    func indexPathsForChildrenOfItemAtIndexPath(indexPath:NSIndexPath) -> [NSIndexPath] {
-        let sectionIndex = indexPath.section
-        let itemIndex = indexPath.item
-        let nextSectionIndex = sectionIndex + 1
-        return self.sectionDescriptions?.optionalElementAtIndex(nextSectionIndex)?.items
-            .filter { $0.parents.containsIndex(itemIndex) }
-            .mapWithIndex({ (childIndex, _) -> NSIndexPath in
-                return NSIndexPath(forItem: childIndex, inSection: nextSectionIndex)
-            }) ?? []
-    }
-    
-	override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        return sectionsInRect(rect).flatMapWithIndex { sectionIndex, section -> [UICollectionViewLayoutAttributes] in
-            return section.itemIndexesInRect(rect)
-                // get the indexPaths
-                .flatMap { itemIndex -> [UICollectionViewLayoutAttributes] in
-                    let itemIndexPath = NSIndexPath(row: itemIndex, section: sectionIndex)
-                    let itemAttributes:[UICollectionViewLayoutAttributes] = [itemIndexPath].flatMap { self.layoutAttributesForItemAtIndexPath($0) }
-                    
-                    let childrenAttributes:[UICollectionViewLayoutAttributes] = self.indexPathsForChildrenOfItemAtIndexPath(itemIndexPath)
-                        .flatMap { self.layoutAttributesForSupplementaryViewOfKind(SchematicLayout.connectorViewKind, atIndexPath: $0)}
-                    
-                    return (childrenAttributes + itemAttributes)
-            }
+    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]?
+    {
+        return indexPathsForItemsInRect(rect)
+            // get the indexPaths
+            .flatMap
+            { itemIndexPath -> [UICollectionViewLayoutAttributes] in
+                return [itemIndexPath].flatMap { self.layoutAttributesForItemAtIndexPath($0) }
+                +
+                    self.indexPathsForChildrenOfItemAtIndexPath(itemIndexPath)
+                    .flatMap { self.layoutAttributesForSupplementaryViewOfKind(SchematicLayout.connectorViewKind, atIndexPath: $0) }
         }
-	}
+    }
 
-	override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+	override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes?
+    {
 		let attributes = SchematicLayoutAttributes(forCellWithIndexPath: indexPath)
-		if let sectionDescriptions = self.sectionDescriptions {
-			attributes.frame = sectionDescriptions[indexPath.section].frameForItemAtIndex(indexPath.item)
-		}
+        guard let frame = sectionDescriptions?[indexPath.section].frameForItemAtIndex(indexPath.item) else
+        {
+            return attributes
+        }
+        
+        attributes.frame = frame
 		return attributes
 	}
     
-    override func layoutAttributesForSupplementaryViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+    override func layoutAttributesForSupplementaryViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes?
+    {
             let attributes = SchematicLayoutAttributes(forSupplementaryViewOfKind: elementKind, withIndexPath: indexPath)
-            if let sectionDescriptions = self.sectionDescriptions, dataController = self.dataController
+            if let sectionDescriptions = self.sectionDescriptions
             {
-                let node = dataController.nodeAtIndexPath(indexPath)
                 let childSectionDescription = sectionDescriptions[indexPath.section]
                 let childFrame = childSectionDescription.frameForItemAtIndex(indexPath.item)
                 for parentIndex in childSectionDescription.items[indexPath.item].parents
