@@ -22,18 +22,16 @@ class Node : Hashable, Equatable {
     
     // setting the parent should be possible only internally.
     // do not set the parent extenally.
-    weak var parent:Node? {
-        didSet {
-            parentHash = self.parent?.hashValue ?? 0
-        }
-    }
+    weak var parent:Node?
     
     func onChildrenChanged(new:Set<Node>,old:Set<Node>) {
         for child in old.filter( {!new.contains($0)} ) {
             child.parent = nil
+            child.parentHash = 0
         }
-        for child in new {
+        for (index,child) in new.enumerate() {
             child.parent = self
+            child.parentHash = self.hashValue + index
         }
     }
     
