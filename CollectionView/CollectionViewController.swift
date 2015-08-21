@@ -1,12 +1,11 @@
 import UIKit
 
-struct Metrics : CollectionViewLayoutMetrics{
+struct Metrics : CollectionViewLayoutMetrics, LayoutMetrics {
     var sectionMargin:CGFloat = 12
     var nodeSize = CGSizeMake(100, 100)
     var sectionPadding:CGFloat = 30
     init() {}
 }
-
 
 class CollectionViewController: UICollectionViewController {
 
@@ -22,12 +21,13 @@ class CollectionViewController: UICollectionViewController {
 		super.viewWillAppear(animated)
 	}
 
-    typealias Layout = CollectionViewLayout<Metrics>
+    //typealias Layout = CollectionViewLayout<Metrics>
+    typealias Layout = MyCollectionViewLayout <Metrics, AmosLayoutItemsProvider>
     
 	var dataController:SchematicDataController? {
 		didSet {
 			let layout = Layout()
-			layout.dataController = dataController
+			//layout.dataController = dataController
 			self.layout = layout
 		}
 	}
