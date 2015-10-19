@@ -1,14 +1,15 @@
 import UIKit
 
 enum MyCollectionViewItem : CollectionViewItem {
-    case Normal(CGSize, NSIndexPath)
-    case Connector(CGSize, NSIndexPath)
-    var size:CGSize {
+    case Normal(CGRect, NSIndexPath)
+    case Connector(CGRect, NSIndexPath)
+    
+    var frame:CGRect {
         switch self {
-        case .Normal(let size, _):
-            return size
-        case .Connector(let size, _):
-            return size
+        case .Normal(let frame, _):
+            return frame
+        case .Connector(let frame, _):
+            return frame
         }
     }
     var indexPath:NSIndexPath {
@@ -24,12 +25,34 @@ enum MyCollectionViewItem : CollectionViewItem {
             return self.indexPath.hashValue
         }
     }
-    var supplementaryItemDescription:SupplementaryItemDescripton? {
-        switch self {
-        case .Connector(_, _):
-            return SupplementaryItemDescripton(kind:"Connector")
-        default:
-            return nil
+    var layoutAttributes : UICollectionViewLayoutAttributes? {
+        get {
+            switch self {
+            case .Normal(_, let indexPath):
+                return UICollectionViewLayoutAttributes(forCellWithIndexPath: indexPath)
+            case .Connector(_, let indexPath):
+                return SchematicLayoutAttributes(forSupplementaryViewOfKind:"Connector", withIndexPath: indexPath)
+            }
+        }
+    }
+    var supplementaryAttributesKind : String? {
+        get {
+            switch self {
+            case .Normal:
+                return nil
+            case .Connector:
+                return "Connector"
+            }
+        }
+    }
+    var supplementarylayoutAttributes : UICollectionViewLayoutAttributes? {
+        get {
+            switch self {
+            case .Normal:
+                return nil
+            case .Connector:
+                return nil
+            }
         }
     }
 }

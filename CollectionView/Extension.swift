@@ -10,7 +10,7 @@ extension Array {
 }
 
 extension SequenceType {
-    func mapWithIndex<T>(transform:(Int,Self.Generator.Element)->T) -> [T] {
+    func mapWithIndex<T>(@noescape transform:(Int,Self.Generator.Element)->T) -> [T] {
         var mutable = [T]()
         for (index, element) in self.enumerate() {
             let new = transform(index, element)
@@ -18,7 +18,7 @@ extension SequenceType {
         }
         return mutable
     }
-    func flatMapWithIndex<T>(transform:(Int,Self.Generator.Element)->[T]) -> [T] {
+    func flatMapWithIndex<T>(@noescape transform:(Int,Self.Generator.Element)->[T]) -> [T] {
         var mutable = [T]()
         for (index, element) in self.enumerate() {
             let new = transform(index, element)
@@ -26,6 +26,16 @@ extension SequenceType {
         }
         return mutable
     }
+    
+    func filterWithIndex(@noescape includeElement:(Int,Self.Generator.Element)->Bool) -> [Self.Generator.Element] {
+        var index = 0
+        return self.filter { element in
+            let ret = includeElement(index,element)
+            index++
+            return ret
+        }
+    }
+
 }
 
 
@@ -51,6 +61,15 @@ extension CollectionType where Self.Generator.Element : Equatable {
             }
             return sum
         }.count
+    }
+    
+    func find<T>(transformElement: Self.Generator.Element -> T? ) -> T? {
+        for element in self {
+            if let result = transformElement(element) {
+                return result
+            }
+        }
+        return nil
     }
 }
 

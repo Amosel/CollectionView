@@ -6,7 +6,6 @@ let s = [1,2,3,4,5].flatMap { return [$0,$0*2,$0*3] }
 
 s
 
-
 extension NSIndexPath {
     
     convenience init(path:[Int]) {
