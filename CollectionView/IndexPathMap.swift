@@ -19,7 +19,7 @@ struct IndexPathMap <T: Equatable> {
     }
     var numberOfSections:Int {
         get {
-            return storage.keys.array.countToken { $0.section }
+            return storage.keys.countToken { $0.section }
         }
     }
     func nextIndexPathAtSection(section:Int) -> NSIndexPath {
