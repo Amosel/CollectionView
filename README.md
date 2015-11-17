@@ -4,7 +4,7 @@
 
 This is a proejct that is probably similar to what Nathan used.
 
-
+![CollectionView.jpg](https://raw.githubusercontent.com/Amosel/CollectionView/master/Stuff/CollectionView.jpg)
 
 ## Usage
 
