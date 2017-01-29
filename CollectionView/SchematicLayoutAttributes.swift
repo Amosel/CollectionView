@@ -1,10 +1,10 @@
 import UIKit
 
-class SchematicLayoutAttributes: UICollectionViewLayoutAttributes {
+class SchematicLayoutAttributes : UICollectionViewLayoutAttributes {
     var connectorLineStartTop: Bool = true
     
-    override func copyWithZone(zone: NSZone) -> AnyObject {
-        var copy = super.copyWithZone(zone) as! SchematicLayoutAttributes
+    override func copy(with zone: NSZone?) -> Any {
+        let copy = super.copy(with: zone) as! SchematicLayoutAttributes
         copy.connectorLineStartTop = self.connectorLineStartTop
         return copy
     }

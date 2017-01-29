@@ -1,7 +1,7 @@
 import Foundation
 
 class Node : Hashable, Equatable {
-	init(name:String, type:NodeType, @noescape createChildren: ()->Set<Node>) {
+	init(name:String, type:NodeType, createChildren: () -> Set<Node>) {
 		self.nodeType = type
 		self.name = name
 		self.children = createChildren()
@@ -14,21 +14,21 @@ class Node : Hashable, Equatable {
 	}
 	let name:String
     enum NodeType : Int {
-        case Normal = 1
-        case Important = 2
-        case Critical = 3
+        case normal = 1
+        case important = 2
+        case critical = 3
     }
 	let nodeType:NodeType
     
     // setting the parent should be possible only internally.
     // do not set the parent extenally.
-    weak var parent:Node? {
+    weak var parent: Node? {
         didSet {
             parentHash = self.parent?.hashValue ?? 0
         }
     }
     
-    func onChildrenChanged(new:Set<Node>,old:Set<Node>) {
+    func onChildrenChanged(_ new:Set<Node>,old:Set<Node>) {
         for child in old.filter( {!new.contains($0)} ) {
             child.parent = nil
         }
@@ -50,14 +50,14 @@ class Node : Hashable, Equatable {
         }
     }
     
-    func walk(level:Int, @noescape visit:(node:Node,level:Int)->()) {
-        visit(node: self,level: level)
+    func walk(_ level:Int, visit: (_ node:Node,_ level:Int) -> ()) {
+        visit(self,level)
         let nextLevel = level+1
         for each in self.children {
             each.walk(nextLevel, visit: visit)
         }
     }
-    func walk(@noescape visit:(node:Node, level:Int) -> ()) {
+    func walk(_ visit: (_ node:Node, _ level:Int) -> ()) {
         walk(0, visit: visit)
     }
     
@@ -72,10 +72,30 @@ class Node : Hashable, Equatable {
         }
         return mutable
     }
-
+    static func ==(lhs:Node, rhs:Node) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
 }
 
-func ==(lhs:Node, rhs:Node) -> Bool {
-    return lhs.hashValue == rhs.hashValue
-}
+extension Node {
+    var byIndexPaths : [IndexPath : Node] {
+        var mutable : [IndexPath : Node] = [:]
+        self.walk({ (node, level) -> () in
+            let indexPath = mutable.keys.nextIndexPathInSection(level)
+            mutable[indexPath] = node
+        })
+        return mutable
+    }
 
+    var array : [[Node]] {
+        var mutable = [[Node]]()
+        self.walk({ (node, level) -> () in
+            if mutable.count > level {
+                mutable[level] = mutable[level]+[node]
+            } else {
+                mutable.append([node])
+            }
+        })
+        return mutable
+    }
+}

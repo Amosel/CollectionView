@@ -2,7 +2,7 @@ import UIKit
 
 struct Metrics : CollectionViewLayoutMetrics{
     var sectionMargin:CGFloat = 12
-    var nodeSize = CGSizeMake(100, 100)
+    var nodeSize = CGSize(width: 100, height: 100)
     var sectionPadding:CGFloat = 30
     init() {}
 }
@@ -12,13 +12,13 @@ class CollectionViewController: UICollectionViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-        collectionView?.registerClass(SchematicConnectorView.self, forSupplementaryViewOfKind: SchematicLayout.connectorViewKind, withReuseIdentifier: SchematicConnectorView.viewReuseIdentifier)
+        collectionView?.register(SchematicConnectorView.self, forSupplementaryViewOfKind: SchematicLayout.connectorViewKind, withReuseIdentifier: SchematicConnectorView.viewReuseIdentifier)
         let dataController = SchematicDataController()
 		dataController.performFetch()
         self.dataController = dataController
 	}
 
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 	}
 
@@ -40,29 +40,30 @@ class CollectionViewController: UICollectionViewController {
         }
     }
 
-    var sectionsMap:SchematicDataController.SectionMap? {
+    var sectionsMap: SchematicDataController.SectionMap? {
         get {
             return dataController?.sectionsMap
         }
     }
     
-	override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+	override func numberOfSections(in collectionView: UICollectionView) -> Int {
 		return sectionsMap?.numberOfSections ?? 0
 	}
-	override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		return sectionsMap?.numberOfRowsInSection(section) ?? 0
+	override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return sectionsMap?.numberOfRows(in: section) ?? 0
 	}
 
-	override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell
+	override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
 	{
-		let cell = collectionView.dequeueReusableCellWithReuseIdentifier(SchematicNodeCell.cellReuseIdentifier, forIndexPath: indexPath) as! SchematicNodeCell
-		cell.node = sectionsMap?.nodeAtIndexPath(indexPath)
+		let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SchematicNodeCell.cellReuseIdentifier, for: indexPath
+            ) as! SchematicNodeCell
+		cell.node = sectionsMap?.element(at: indexPath)
 		return cell
 	}
-    override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) ->
+    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) ->
         UICollectionReusableView
     {
-        return self.collectionView!.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: SchematicConnectorView.viewReuseIdentifier, forIndexPath: indexPath)
+        return self.collectionView!.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SchematicConnectorView.viewReuseIdentifier, for: indexPath)
     }
 }
 

@@ -1,15 +1,15 @@
 import UIKit
 
 extension Node.NodeType {
-	var nodeColors:(label:UIColor, background:UIColor) {
+	var nodeColors:(label: UIColor, background: UIColor) {
 		get {
 			switch self {
-			case .Normal:
-				return (label:UIColor.blackColor(), background:UIColor.lightGrayColor())
-			case .Important:
-				return (label:UIColor.blackColor(), background:UIColor.yellowColor())
-			case .Critical:
-				return (label:UIColor.whiteColor(), background:UIColor.redColor())
+			case .normal:
+				return (label:UIColor.black, background:UIColor.lightGray)
+			case .important:
+				return (label:UIColor.black, background:UIColor.yellow)
+			case .critical:
+				return (label:UIColor.white, background:UIColor.red)
 			}
 		}
 	}
@@ -21,7 +21,7 @@ class SchematicNodeCell : UICollectionViewCell {
 	@IBOutlet var containerView: UIView!
 	var node:Node? {
 		didSet {
-			let colors = node?.nodeType.nodeColors ?? (label:UIColor.clearColor(), background:UIColor.clearColor())
+			let colors = node?.nodeType.nodeColors ?? (label:UIColor.clear, background:UIColor.clear)
 			nameLabel.text = node?.name
 			nameLabel.textColor = colors.label
 			containerView.backgroundColor = colors.background

@@ -3,7 +3,7 @@ import UIKit
 class SchematicConnectorView : UICollectionReusableView {
     static let viewReuseIdentifier = "SchematicConnectorView"
     var lineStartTop: Bool = true
-    override class func layerClass() -> AnyClass {
+    override class var layerClass : AnyClass {
         return CAShapeLayer.self
     }
     var shapeLayer: CAShapeLayer {
@@ -21,13 +21,13 @@ class SchematicConnectorView : UICollectionReusableView {
     }
     
     func sharedInit() {
-        self.opaque = true
+        self.isOpaque = true
         self.shapeLayer.fillColor = nil
-        self.shapeLayer.strokeColor = UIColor.lightGrayColor().CGColor
+        self.shapeLayer.strokeColor = UIColor.lightGray.cgColor
         self.shapeLayer.lineWidth = 2.0
     }
-    override func applyLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttributes) {
-        super.applyLayoutAttributes(layoutAttributes)
+    override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
+        super.apply(layoutAttributes)
         if let attributes = layoutAttributes as? SchematicLayoutAttributes {
             self.lineStartTop = attributes.connectorLineStartTop
         }
@@ -41,8 +41,8 @@ class SchematicConnectorView : UICollectionReusableView {
             end.y = self.bounds.minY
             }
             let path = UIBezierPath()
-            path.moveToPoint(start)
-            path.addLineToPoint(end)
-            self.shapeLayer.path = path.CGPath
+            path.move(to: start)
+            path.addLine(to: end)
+            self.shapeLayer.path = path.cgPath
         }
     }

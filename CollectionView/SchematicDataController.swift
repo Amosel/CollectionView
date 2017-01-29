@@ -1,79 +1,49 @@
 import UIKit
 
-func transform(tree:Node?) -> IndexPathMap<Node> {
-    return IndexPathMap<Node> {
-        var mutable = [NSIndexPath : Node]()
-        tree?.walk({ (node, level) -> () in
-            let indexPath = mutable.keys.nextIndexPathInSection(level)
-            mutable[indexPath] = node
-        })
-        return mutable
-    }
-}
-
-func transform(tree:Node?) -> [[Node]] {
-    var nodes = [[Node]]()
-    tree?.walk({ (node, level) -> () in
-        if nodes.count > level {
-            nodes[level] = nodes[level]+[node]
-        } else {
-            nodes.append([node])
-        }
-    })
-    return nodes
-}
-
 class SchematicDataController : NSObject {
-    
+
     typealias SectionMap = IndexPathMap<Node>
-    var sectionsMap = SectionMap { () -> ([NSIndexPath : Node]) in
+    var sectionsMap = SectionMap {
         return [:]
     }
-    
+    var sections = [[Node]]()
+
     var tree: Node? {
         didSet {
-            sectionsMap = transform(tree)
-            sections = transform(tree)
+            sectionsMap = IndexPathMap {
+                tree?.byIndexPaths ?? [:]
+            }
+            sections = tree?.array ?? []
         }
     }
-	var sections = [[Node]]()
 	var maxNodesInSection = 0
 
 	func performFetch() {
-		tree = Node(name:"Root", type:.Normal)
+		tree = Node(name:"Root", type:.normal)
 		{[
-			Node(name:"Child 1", type:.Normal)
+			Node(name:"Child 1", type:.normal)
 			{[
-					Node(name:"Child 1-1", type:.Important),
-					Node(name:"Child 1-2", type:.Critical)
+					Node(name:"Child 1-1", type:.important),
+					Node(name:"Child 1-2", type:.critical)
 			]},
-			Node(name:"Child 2", type:.Normal),
-			Node(name:"Child 3", type:.Normal)
+			Node(name:"Child 2", type:.normal),
+			Node(name:"Child 3", type:.normal)
 			{[
-				Node(name:"Child 3-1", type:.Normal)
+				Node(name:"Child 3-1", type:.normal)
 				{[
-					Node(name:"Child 3-1-1", type:.Critical),
-					Node(name:"Child 3-1-2", type:.Normal)
+					Node(name:"Child 3-1-1", type:.critical),
+					Node(name:"Child 3-1-2", type:.normal)
 				]},
-				Node(name:"Child 3-2", type:.Important)
+				Node(name:"Child 3-2", type:.important)
 			]}
 		]}
 	}
 
-	func nodeAtIndexPath(indexPath: NSIndexPath) -> Node? {
-		if let section = self.sections.optionalElementAtIndex(indexPath.section) {
-			return section.optionalElementAtIndex(indexPath.row)
-		}
-		return nil
+	func element(at indexPath: IndexPath) -> Node? {
+        return self.sectionsMap.element(at: indexPath)
 	}
-	func indexPathForNode(node: Node) -> NSIndexPath? {
-		for (sectionIndex, section) in self.sections.enumerate() {
-			for (itemIndex, item) in section.enumerate() {
-				if node == item {
-					return NSIndexPath(forItem: itemIndex, inSection: sectionIndex)
-				}
-			}
-		}
-		return nil
+
+	func indexPath(for element: Node) -> IndexPath? {
+        return self.sectionsMap.indexPath(for: element)
 	}
 }

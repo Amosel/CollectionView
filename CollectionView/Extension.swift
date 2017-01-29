@@ -1,26 +1,40 @@
 import Foundation
 
-extension Array {
-	func optionalElementAtIndex(index:Int) -> Array.Generator.Element? {
-		if self.count > index {
-			return self[index]
-		}
-		return nil
-	}
+extension Sequence where Self.Iterator.Element == IndexPath {
+
+    func nextItemIndexAtSection(_ section: Int) -> Int {
+        return filter { section == $0.section }
+            .map { $0.item + 1}
+            .max() ?? 0
+    }
+
+    func nextIndexPathInSection(_ section:Int) -> Iterator.Element {
+        return IndexPath(item: nextItemIndexAtSection(section), section: section)
+    }
 }
 
-extension SequenceType {
-    func mapWithIndex<T>(transform:(Int,Self.Generator.Element)->T) -> [T] {
+extension RandomAccessCollection where Index == Int {
+
+    func optional(at index: Int) -> (Index, Iterator.Element)? {
+        guard (startIndex..<endIndex).contains(index) else {
+            return nil
+        }
+        return (index, self[index])
+    }
+}
+
+extension Sequence {
+    func mapWithIndex<T>(_ transform:(Int, Self.Iterator.Element) -> T) -> [T] {
         var mutable = [T]()
-        for (index, element) in self.enumerate() {
+        for (index, element) in self.enumerated() {
             let new = transform(index, element)
             mutable.append(new)
         }
         return mutable
     }
-    func flatMapWithIndex<T>(transform:(Int,Self.Generator.Element)->[T]) -> [T] {
+    func flatMapWithIndex<T>(_ transform:(Int, Self.Iterator.Element) -> [T]) -> [T] {
         var mutable = [T]()
-        for (index, element) in self.enumerate() {
+        for (index, element) in self.enumerated() {
             let new = transform(index, element)
             mutable += new
         }
@@ -28,82 +42,58 @@ extension SequenceType {
     }
 }
 
-
-extension SequenceType where Self.Generator.Element : Equatable {
+extension Collection {
+    typealias Element = Iterator.Element
     
-    func any (test:(Self.Generator.Element)->Bool ) -> Bool {
-        for element in self {
-            if test(element) { return true }
-        }
-        return false
-    }
+    func group<Key : Hashable >(with fn: (Element) -> (Key) ) -> [Key : [Element] ] {
 
-    func count(test:(Self.Generator.Element)->Bool ) -> Int {
-        return reduce(0) { if test($1) { return $0 + 1 } else { return $0 } }
-    }
+        typealias Bundle = [ Key: [Element] ]
 
-    func countToken <T:Hashable> (test:(Self.Generator.Element)->T ) -> Int {
-        return reduce([T]()) {(var sum, let item) in
-            let token = test(item)
-            if !sum.contains( token )
-            {
-                sum.append(token)
-            }
-            return sum
-        }.count
-    }
-}
+        var mutalbe = Bundle()
 
-extension Dictionary {
-    func any (test:(Value)->Bool ) -> Key? {
-        for (key,value) in self {
-            if test(value) { return key }
-        }
-        return nil
-    }
-}
-
-extension CollectionType {
-    typealias Element = Generator.Element
-    
-    func groupBy<Key : Hashable >(fn:(Element)->(Key)) -> [Key:[Element]] {
-        typealias Bundle = [Key:[Element]]
-        return reduce(Bundle()) { (var bundle, element) in
-            let key = fn(element)
-            if var array = bundle[key] {
-                array.append(element)
+        forEach {
+            let key = fn($0)
+            if var array = mutalbe[key] {
+                array.append($0)
             } else {
-                bundle[key] = [element]
+                mutalbe[key] = [$0]
             }
-            return bundle
         }
-        
+        return mutalbe
     }
     
-    func groupBy<Key : Hashable, NewElement >(fn:(Element)->(Key,NewElement)) -> [Key:[NewElement]] {
-        typealias Bundle = [Key:[NewElement]]
-        return reduce(Bundle()) { (var bundle, element) in
-            let (key, newElement) = fn(element)
-            if var array = bundle[key] {
-                array.append(newElement)
+    func group <Key : Hashable, NewElement > (with fn: (Element) -> (Key, NewElement) ) -> [Key : [NewElement] ] {
+
+        typealias Bundle = [ Key : [NewElement]]
+
+        var mutalbe = Bundle()
+
+        forEach {
+            let (key, new) = fn($0)
+            if var array = mutalbe[key] {
+                array.append(new)
             } else {
-                bundle[key] = [newElement]
+                mutalbe[key] = [new]
             }
-            return bundle
         }
+        return mutalbe
     }
     
-    func groupBy<Key : Hashable, NewKey: Hashable,NewValue >(fn:(Element)->(Key,NewKey,NewValue)) -> [Key:[NewKey : NewValue]] {
-        typealias Bundle = [Key:[NewKey : NewValue]]
-        return reduce(Bundle()) { (var bundle, element) in
-            let (key, newKey, newValue) = fn(element)
-            if var dictionary = bundle[key] {
+    func group<Key : Hashable, NewKey: Hashable, NewValue >(with fn:(Element) -> (Key, NewKey, NewValue)) -> [Key: [NewKey : NewValue] ] {
+
+        typealias Bundle = [Key : [NewKey : NewValue]]
+
+        var mutalbe = Bundle()
+
+        forEach {
+            let (key, newKey, newValue) = fn($0)
+            if var dictionary = mutalbe[key] {
                 dictionary[newKey] = newValue
             } else {
-                bundle[key] = [newKey : newValue]
+                mutalbe[key] = [newKey : newValue]
             }
-            return bundle
         }
-    }    
+        return mutalbe
+    }
 }
 
