@@ -1,10 +1,9 @@
 import UIKit
 
-struct Metrics : CollectionViewLayoutMetrics{
+struct Metrics : CollectionViewLayoutMetrics {
     var sectionMargin:CGFloat = 12
-    var nodeSize = CGSize(width: 100, height: 100)
+    var itemSize = CGSize(width: 100, height: 100)
     var sectionPadding:CGFloat = 30
-    init() {}
 }
 
 
@@ -22,16 +21,16 @@ class CollectionViewController: UICollectionViewController {
 		super.viewWillAppear(animated)
 	}
 
-    typealias Layout = CollectionViewLayout<Metrics>
+    typealias Layout = CollectionViewLayout<Metrics, SchematicDataController>
     
-	var dataController:SchematicDataController? {
+	var dataController: SchematicDataController? {
 		didSet {
 			let layout = Layout()
 			layout.dataController = dataController
 			self.layout = layout
 		}
 	}
-    var layout:Layout? {
+    var layout: Layout? {
         didSet {
             if let layout = layout {
                 self.collectionView?.collectionViewLayout = layout
@@ -39,7 +38,6 @@ class CollectionViewController: UICollectionViewController {
             }
         }
     }
-
     var sectionsMap: SchematicDataController.SectionMap? {
         get {
             return dataController?.sectionsMap

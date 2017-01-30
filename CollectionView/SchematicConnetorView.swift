@@ -26,17 +26,18 @@ class SchematicConnectorView : UICollectionReusableView {
         self.shapeLayer.strokeColor = UIColor.lightGray.cgColor
         self.shapeLayer.lineWidth = 2.0
     }
+
     override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         if let attributes = layoutAttributes as? SchematicLayoutAttributes {
             self.lineStartTop = attributes.connectorLineStartTop
         }
     }
+
     override func layoutSubviews() {
         var start = CGPoint(x: self.bounds.minX, y: self.bounds.minY)
         var end = CGPoint(x: self.bounds.maxX, y: self.bounds.maxY)
-        if self.lineStartTop
-{
+        if self.lineStartTop {
             start.y = self.bounds.maxY
             end.y = self.bounds.minY
             }

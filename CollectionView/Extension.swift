@@ -15,11 +15,11 @@ extension Sequence where Self.Iterator.Element == IndexPath {
 
 extension RandomAccessCollection where Index == Int {
 
-    func optional(at index: Int) -> (Index, Iterator.Element)? {
+    func optional(at index: Int) -> Iterator.Element? {
         guard (startIndex..<endIndex).contains(index) else {
             return nil
         }
-        return (index, self[index])
+        return self[index]
     }
 }
 

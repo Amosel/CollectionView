@@ -1,6 +1,7 @@
 import UIKit
 
 class SchematicLayoutAttributes : UICollectionViewLayoutAttributes {
+
     var connectorLineStartTop: Bool = true
     
     override func copy(with zone: NSZone?) -> Any {
@@ -11,7 +12,7 @@ class SchematicLayoutAttributes : UICollectionViewLayoutAttributes {
 }
 
 class SchematicLayout {
-    static var connectorViewKind:String {
+    static var connectorViewKind: String {
         get {
             return "SchematicConnector"
         }

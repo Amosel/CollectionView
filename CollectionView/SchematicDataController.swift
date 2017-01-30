@@ -1,6 +1,6 @@
 import UIKit
 
-class SchematicDataController : NSObject {
+class SchematicDataController : NSObject, LayoutDataControllerProtocol {
 
     typealias SectionMap = IndexPathMap<Node>
     var sectionsMap = SectionMap {
@@ -46,4 +46,11 @@ class SchematicDataController : NSObject {
 	func indexPath(for element: Node) -> IndexPath? {
         return self.sectionsMap.indexPath(for: element)
 	}
+    
+    func indexPathForParent(for element:Node) -> IndexPath? {
+        if let parent = element.parent {
+            return self.indexPath(for: parent)
+        }
+        return nil
+    }
 }
